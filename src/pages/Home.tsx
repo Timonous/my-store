@@ -1,8 +1,13 @@
+import { Footer } from "../widgets/footer/Footer";
+import { Header } from "../widgets/header/Header";
 
 export const Home = () => {
   return (
-    <main className="p-4">
-      <div>Hello world</div>
-    </main>
-  )
-}
+    <div className="bg-[#131313] flex flex-row justify-center w-full">
+      <div className="bg-[#131313] w-[770px] relative">
+        <Header />
+        <Footer />
+      </div>
+    </div>
+  );
+};
