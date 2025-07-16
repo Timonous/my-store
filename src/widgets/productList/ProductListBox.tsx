@@ -1,8 +1,9 @@
 
 import { useState } from "react";
-import products from "./products.json"
+import { useQuery } from "@tanstack/react-query";
+import { fetchProducts } from "../../api/products";
+import type { Product } from "../../api/products";
 import { ProductCard } from "./ProductCard"
-import type { Product } from "./ProductCard"
 
 import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
@@ -16,17 +17,22 @@ type ProductListBoxProps = {
 const ProductListBox = ({ category }: ProductListBoxProps) => {
   const [expanded, setExpanded] = useState(false);
 
-  const filteredProducts: Product[] = products.filter(p => p.category === category);
-  const hasMoreThanFive = filteredProducts.length > 5;
+  const { data: products = [], isLoading, isError } = useQuery<Product[]>({
+    queryKey: ["products"],
+    queryFn: fetchProducts,
+  });
 
+  if (isLoading) return <p className="text-white text-sm">Загрузка...</p>;
+  if (isError) return <p className="text-red-500 text-sm">Ошибка при загрузке товаров.</p>;
+
+  const filteredProducts = products.filter(p => p.category === category);
+  const hasMoreThanFive = filteredProducts.length > 5;
   const displayedProducts = expanded ? filteredProducts : filteredProducts.slice(0, 5);
 
   return (
     <Card className="w-full max-w-[790px] bg-[#1f1f1f] rounded-[15px] overflow-hidden border-none">
       <CardHeader className="px-5 pt-6 pb-0 flex flex-row justify-between items-center">
-        <CardTitle className="text-xl text-white font-semibold">
-          {category}
-        </CardTitle>
+        <CardTitle className="text-xl text-white font-semibold">{category}</CardTitle>
 
         {hasMoreThanFive && (
           <Button
@@ -38,11 +44,7 @@ const ProductListBox = ({ category }: ProductListBoxProps) => {
               {expanded ? "Скрыть" : "Показать все"}
             </span>
             <div className="w-[15px] h-[15px] bg-[#373737] rounded-full flex items-center justify-center">
-              {expanded ? (
-                <ChevronUp className="w-3 h-3" />
-              ) : (
-                <ChevronRight className="w-3 h-3" />
-              )}
+              {expanded ? <ChevronUp className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
             </div>
           </Button>
         )}

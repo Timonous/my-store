@@ -3,17 +3,7 @@ import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import { goodsImages } from "../../lib/goodsImageMap"
 import { useCartStore } from "../../app/cartStore";
-
-export type Product = {
-  id: number
-  name: string
-  weight: string
-  price: number
-  oldPrice: number
-  inStock: boolean
-  category: string
-  image: string
-}
+import type { Product } from "../../api/products";
 
 export const ProductCard = ({ product }: { product: Product }) => {
   const { items, addToCart, increment, decrement } = useCartStore();
