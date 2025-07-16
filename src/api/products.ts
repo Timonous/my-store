@@ -1,3 +1,5 @@
+import { create } from "zustand"
+
 export type Product = {
   id: number
   name: string
@@ -9,10 +11,20 @@ export type Product = {
   image: string
 }
 
-export const fetchProducts = async (): Promise<Product[]> => {
-  const res = await fetch("http://localhost:3000/products");
-  if (!res.ok) {
-    throw new Error("Не удалось загрузить товары");
-  }
-  return res.json();
-};
+type ProductState = {
+  products: Product[]
+  fetchProducts: () => Promise<void>
+}
+
+export const useProductStore = create<ProductState>((set) => ({
+  products: [],
+  fetchProducts: async () => {
+    try {
+      const res = await fetch("http://localhost:3000/products") // заменишь на свой URL
+      const data = await res.json()
+      set({ products: data })
+    } catch (error) {
+      console.error("Ошибка загрузки товаров:", error)
+    }
+  },
+}))

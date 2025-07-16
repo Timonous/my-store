@@ -1,33 +1,28 @@
-
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { fetchProducts } from "../../api/products";
-import type { Product } from "../../api/products";
+import { useState } from "react"
 import { ProductCard } from "./ProductCard"
-
 import { Button } from "../../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { ChevronRight, ChevronUp } from "lucide-react"
-
+import { useProductStore } from "../../api/products"
 
 type ProductListBoxProps = {
   category: string
 }
 
 const ProductListBox = ({ category }: ProductListBoxProps) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(false)
 
-  const { data: products = [], isLoading, isError } = useQuery<Product[]>({
-    queryKey: ["products"],
-    queryFn: fetchProducts,
-  });
+  // Берем товары из Zustand-хранилища
+  const products = useProductStore((state) => state.products)
 
-  if (isLoading) return <p className="text-white text-sm">Загрузка...</p>;
-  if (isError) return <p className="text-red-500 text-sm">Ошибка при загрузке товаров.</p>;
+  const filteredProducts = products.filter(p => p.category === category)
+  const hasMoreThanFive = filteredProducts.length > 5
+  const displayedProducts = expanded ? filteredProducts : filteredProducts.slice(0, 5)
 
-  const filteredProducts = products.filter(p => p.category === category);
-  const hasMoreThanFive = filteredProducts.length > 5;
-  const displayedProducts = expanded ? filteredProducts : filteredProducts.slice(0, 5);
+  // Можно добавить простой loading-флаг, если нужно:
+  if (!products.length) {
+    return <p className="text-white text-sm px-4">Загрузка...</p>
+  }
 
   return (
     <Card className="w-full max-w-[790px] bg-[#1f1f1f] rounded-[15px] overflow-hidden border-none">
@@ -58,7 +53,7 @@ const ProductListBox = ({ category }: ProductListBoxProps) => {
         </div>
       </CardContent>
     </Card>
-  );
-};
+  )
+}
 
-export default ProductListBox;
+export default ProductListBox
